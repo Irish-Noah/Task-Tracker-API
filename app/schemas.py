@@ -45,7 +45,7 @@ class UserOut(UserBase):
 
 class UserLogin(BaseModel):
     username: str
-    pasword: str
+    password: str
 
 class Token(BaseModel):
     access_token: str
