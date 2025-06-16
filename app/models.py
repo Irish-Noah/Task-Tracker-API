@@ -9,7 +9,8 @@ tasks = Table(
     Column('id', Integer, primary_key=True),
     Column('title', String, nullable=False),
     Column('description', String),
-    Column('completed', Boolean, default=False)
+    Column('completed', Boolean, default=False),
+    Column('user_id', Integer, ForeignKey('users.id'), nullable=False)
 )
 
 # Create the user table layout

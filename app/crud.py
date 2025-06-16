@@ -7,11 +7,12 @@ from app.database import database
 ''' Task Object API Calls '''
 
 # Create a new task object 
-async def create_task(task: TaskCreate): 
+async def create_task(task: TaskCreate, user_id: int): 
     query = tasks.insert().values(
         title=task.title,
         description=task.description,
-        completed=False
+        completed=False, 
+        user_id=user_id
     )
     task_id = await database.execute(query)
     # dictionary unpacking syntax and adds two fields (id, completed)
@@ -20,6 +21,11 @@ async def create_task(task: TaskCreate):
 # Get all tasks 
 async def get_tasks(): 
     query = select(tasks)
+    return await database.fetch_all(query)
+
+# Get tasks by user
+async def get_user_tasks(user_id: int): 
+    query = select(tasks).where(tasks.c.user_id == user_id)
     return await database.fetch_all(query)
 
 # Get task by ID

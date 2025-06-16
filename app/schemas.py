@@ -20,6 +20,7 @@ class TaskUpdate(BaseModel):
 class Task(TaskCreate):
     id: int
     title: str
+    user_id: int
 
     class Config: 
         from_attributes = True # convert to JSON
@@ -36,6 +37,9 @@ class UserCreate(UserBase):
 
 class UserOut(UserBase):
     id: int
+    username: str
+    email: str
+    password: str # Needs to be dehashed for admin display
 
     class Config: 
         from_attributes = True # conver to JSON
