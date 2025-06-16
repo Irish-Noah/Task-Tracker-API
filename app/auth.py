@@ -1,6 +1,6 @@
 # app/auth.py
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from app import models, config
 from app.crud import get_user_by_id
 from databases import Database
+from app.database import database
 
 # Load env 
 load_dotenv()
@@ -33,7 +34,7 @@ def verify_pwd(plain_password: str, hashed_password: str) -> bool:
 # JWT Creation
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None): 
     to_encode = data.copy() # create shallow copy 
-    expire = datetime.now(datetime.timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINS))
     to_encode.update({'exp': expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -51,7 +52,7 @@ def verify_access_token(token: str):
         )
     
 # Check users JWT
-async def get_current_user(token: str = Depends(oauth_scheme), database: Database = Depends(config.get_database)) -> models.User:
+async def get_current_user(token: str = Depends(oauth_scheme)) -> dict:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='Could not validate user credentials',

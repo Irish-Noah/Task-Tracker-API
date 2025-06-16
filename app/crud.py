@@ -54,7 +54,7 @@ async def create_user(user: UserCreate, password: str):
     query = users.insert().values(
         username=user.username,
         email=user.email, 
-        password=user.password
+        password=password
     )
     user_id = await database.execute(query)
     return {**user.dict(exclude={'password'}), 'id': user_id}
