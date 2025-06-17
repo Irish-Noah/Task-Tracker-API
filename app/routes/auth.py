@@ -1,6 +1,6 @@
 # app/routes/auth.py
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas import UserCreate, UserOut, Token
+from app.schemas import UserCreate, UserOut, Token, UserBase
 from app.auth import hash_pwd, verify_pwd, create_access_token
 from app.crud import get_user_by_username, get_user_by_email, create_user
 from app.database import database
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 # handle the new user registration api call 
-@router.post('/register', response_model=UserOut)
+@router.post('/register', response_model=UserBase)
 async def register(user: UserCreate):
     # Make sure user doesn't already exist
     existing_user = await get_user_by_username(user.username)

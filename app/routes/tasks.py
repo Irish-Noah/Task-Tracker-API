@@ -1,7 +1,8 @@
 # app/routes/tasks.py
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.schemas import TaskCreate, Task, TaskUpdate
 from app.crud import create_task, get_user_tasks, get_tasks, get_task_by_id, update_task_by_id, delete_all, delete_by_id
+from app.auth import get_current_user
 
 # Set Swagger group for these apis as "Tasks"
 router = APIRouter(
@@ -10,21 +11,22 @@ router = APIRouter(
 
 # handle the basic task creation api call 
 @router.post('/', response_model=Task)
-async def create(task: TaskCreate):
-    return await create_task(task, user_id=1)
+async def create(task: TaskCreate, current_user: dict = Depends(get_current_user)):
+    return await create_task(task, user_id=current_user['id'])
 
 
 # handle reading tasks created by a user, keyed off by the user's ID
-@router.get('/tasks/{user_id}', response_model=list[Task])
-async def read_tasks_by_user(user_id: int): 
+@router.get('/my-tasks', response_model=list[Task])
+async def read_tasks_by_user(current_user: dict = Depends(get_current_user)): 
+    user_id = current_user['id']
     tasks = await get_user_tasks(user_id)
-    if not tasks: 
+    if not tasks:
         raise HTTPException(status_code=404, detail=f'No tasks created by user {user_id}')
-    return await get_user_tasks(user_id)
+    return tasks
 
 
 # handle reading all tasks, independent from user ownership (admin view)
-@router.get('/tasks/', response_model=list[Task])
+@router.get('/tasks', response_model=list[Task])
 async def read_tasks(): 
     tasks = await get_tasks()
     if not tasks: 
@@ -38,7 +40,7 @@ async def task_by_id(task_id: int):
     task = await get_task_by_id(task_id)
     if task is None: 
         raise HTTPException(status_code=404, detail="No task found with that ID")
-    return task 
+    return task
 
 
 # handle updating the contents of a task by its ID

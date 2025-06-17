@@ -1,9 +1,13 @@
 # app/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from app.database import database
 from app.routes import tasks, users, auth
 
-app = FastAPI()
+app = FastAPI(
+    title="Task Tracker",
+    description="API for managing tasks and users",
+    version="1.0.0",
+)
 
 # Link apis into project
 app.include_router(tasks.router)

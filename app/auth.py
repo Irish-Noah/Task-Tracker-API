@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -21,7 +21,7 @@ ALGORITHM = os.getenv('ALGORITHM', 'HS256')
 ACCESS_TOKEN_EXPIRATION_MINS = int(os.getenv('ACCESS_TOKEN_EXPIRATION_MINS', 30))
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth_scheme = OAuth2PasswordBearer(tokenUrl='login')
+app_oauth_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 
 # handle hasing a user password to be stored in the database 
 def hash_pwd(password: str) -> str: 
@@ -52,12 +52,15 @@ def verify_access_token(token: str):
     
     
 # Check users JWT, used for user specific api calls
-async def get_current_user(token: str = Depends(oauth_scheme)) -> dict:
+async def get_current_user(token: str = Depends(app_oauth_scheme)) -> dict:
+    
     try: 
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get('user_id')
+        user_id = int(payload.get('sub'))
         if user_id is None: 
-            raise HTTPException(status_code=401, detail="Could not validate credentials")
+            raise HTTPException(status_code=401, detail="Invalid token")
+        print("Decoded JWT payload:", payload)
+        print("Extracted user_id:", user_id)
     except JWTError: 
         raise HTTPException(status_code=401, detail="Could not validate credentials")
     
