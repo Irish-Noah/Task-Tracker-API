@@ -17,13 +17,25 @@ class TaskUpdate(BaseModel):
     completed: bool = False
 
 # Get Task object from db
-class Task(TaskCreate):
+class Task(BaseModel):
     id: int
     title: str
+    description: Optional[str] = None
+    completed: bool
     user_id: int
 
-    class Config: 
-        from_attributes = True # convert to JSON
+    class Config:
+        from_attributes = True
+
+# GET Task object from db 
+class TaskOut(BaseModel):
+    id: int
+    title: str
+    description: Optional[str]
+    completed: bool
+
+    class Config:
+        from_attributes = True
 
 
 ''' User Object Schemas '''

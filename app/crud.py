@@ -1,7 +1,7 @@
 # app/crud.py
 from sqlalchemy import select, delete, update
 from app.models import tasks, users
-from app.schemas import TaskCreate, TaskUpdate, UserCreate
+from app.schemas import TaskCreate, TaskUpdate, UserCreate, Task
 from app.database import database 
 
 ''' Task Object API Calls '''
@@ -29,16 +29,17 @@ async def get_user_tasks(user_id: int):
     return await database.fetch_all(query)
 
 # Get task by ID
-async def get_task_by_id(task_id): 
-    query = select(tasks).where(tasks.c.id == task_id)
+async def get_task_by_title(task_title, user_id): 
+    query = select(tasks).where(tasks.c.title == task_title and tasks.c.user_id == user_id)
     return await database.fetch_one(query)
 
 # Update a task by ID
-async def update_task_by_id(task_id, task: TaskUpdate): 
-    query = update(tasks).where(tasks.c.id == task_id).values(
+async def update_task_by_name(task_name, task: Task, user_id): 
+    query = update(tasks).where(tasks.c.title == task_name and tasks.c.user_id == user_id).values(
         title=task.title,
         description=task.description,
-        completed=task.completed
+        completed=task.completed,
+        user_id=user_id
     )
     return await database.execute(query)
 
@@ -48,8 +49,8 @@ async def delete_all():
     return await database.execute(query)
 
 # Delete a task by ID
-async def delete_by_id(task_id): 
-    query = delete(tasks).where(tasks.c.id == task_id)
+async def delete_by_id(task_name, user_id): 
+    query = delete(tasks).where(tasks.c.title == task_name and tasks.c.user_id == user_id)
     return await database.execute(query)
 
 
