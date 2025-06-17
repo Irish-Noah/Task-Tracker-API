@@ -4,19 +4,19 @@ from typing import Optional
 
 ''' Task Object Schemas'''
 
-# Incoming data (client -> task)
+# Create Task object
 class TaskCreate(BaseModel): 
     title: str
     description: Optional[str] = None
     completed: bool = False
 
-# Update Task Object
+# Update existing Task object
 class TaskUpdate(BaseModel):
     title: str = None
     description: Optional[str] = None
     completed: bool = False
 
-# Outgoing data (task -> client)
+# Get Task object from db
 class Task(TaskCreate):
     id: int
     title: str
@@ -28,13 +28,16 @@ class Task(TaskCreate):
 
 ''' User Object Schemas '''
 
+# Basic User object
 class UserBase(BaseModel):
     username: str
     email: EmailStr
 
+# Register User object
 class UserCreate(UserBase):
     password: str
 
+# Get User object from db 
 class UserOut(UserBase):
     id: int
     username: str
@@ -47,10 +50,12 @@ class UserOut(UserBase):
 
 ''' User Auth Schemas'''
 
+# Expected User object for login 
 class UserLogin(BaseModel):
     username: str
     password: str
 
+# Token object for post login tasks
 class Token(BaseModel):
     access_token: str
     token_type: str

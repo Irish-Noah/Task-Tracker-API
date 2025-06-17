@@ -1,6 +1,6 @@
 import asyncio
 from app.models import metadata
-from app.database import engine, database
+from app.database import engine
 
 # one time run, just creates the table from the database.py file
 async def create_tables(): 
